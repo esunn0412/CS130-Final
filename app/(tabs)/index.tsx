@@ -1,98 +1,86 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import {
+  Platform,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  useColorScheme,
+} from "react-native";
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+import { useAuth } from "@/context/auth";
+import { Redirect } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Colors } from "@/constants/theme";
 
 export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+  const color = useColorScheme();
+  const { user } = useAuth();
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+  if (!user) {
+    return <Redirect href="/login" />;
+  }
+
+  return (
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor: Colors[color ?? "light"].background }}
+      edges={["top"]}
+    >
+      <TouchableOpacity style={styles.signOutRow}>
+        <Text style={styles.signOutText}>sign out</Text>
+      </TouchableOpacity>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  scroll: { padding: 16, gap: 14, flexGrow: 1 },
+
+  // Profile card
+  profileCard: {
+    borderRadius: 16,
+    borderWidth: 1,
+    padding: 18,
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 2,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  profileTop: { flexDirection: "row", gap: 12 },
+  emailText: { fontSize: 16, fontWeight: "600", marginBottom: 8 },
+  badgeRow: { flexDirection: "row", flexWrap: "wrap", gap: 6 },
+  badge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20 },
+  badgeText: { fontSize: 12, fontWeight: "600" },
+  scoreBox: { flexDirection: "row", alignItems: "baseline" },
+  scoreNum: { fontSize: 28, fontWeight: "800" },
+  scorePts: { fontSize: 13, fontWeight: "500" },
+  signOutRow: { flexDirection: "row", alignItems: "center", gap: 4 },
+  signOutText: { fontSize: 13 },
+
+  // Section
+  sectionTitle: { fontSize: 11, fontWeight: "700", letterSpacing: 1 },
+
+  // Announcements card
+  announcementCard: {
+    borderRadius: 16,
+    borderWidth: 1,
+    overflow: "hidden",
+    shadowColor: "#000",
+    shadowOpacity: 0.04,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 1,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  announcementItem: { padding: 16, gap: 8 },
+  announcementHeader: { flexDirection: "row", alignItems: "center", gap: 8 },
+  announcementTitle: { flex: 1, fontSize: 15, fontWeight: "600" },
+  announcementDate: { fontSize: 12, flexShrink: 0 },
+  announcementBody: { fontSize: 14, lineHeight: 20 },
+  separator: { height: 1, marginHorizontal: 16 },
+
+  center: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: 40,
   },
 });

@@ -1,0 +1,137 @@
+import { useAuth } from "@/context/auth";
+import { useState } from "react";
+import { router } from "expo-router";
+import {
+  View,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableWithoutFeedback,
+  TouchableOpacity,
+} from "react-native";
+import { Colors } from "@/constants/theme";
+import { FirebaseError } from "firebase/app";
+
+export default function SignUpScreen() {
+  const { signUp } = useAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+
+  function signUpHandler() {
+    if (!email || !password) {
+      setError("please enter your email and password");
+      return; 
+    }
+
+    signUp(email, password)
+      .then(() => {
+        console.log("signed Up");
+        router.push("/");
+        return;
+      })
+      .catch((e: FirebaseError) => {
+        console.log(e);
+        setError(formatError(e.code));
+        return;
+      });
+  }
+
+  return (
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+      >
+        <View style={styles.card}>
+          <Text style={styles.title}>Sign up to Emory Hacks</Text>
+          <TextInput
+            placeholder="email"
+            placeholderTextColor="#9BA1A6"
+            value={email}
+            onChangeText={setEmail}
+            style={styles.input}
+          />
+          <TextInput
+            placeholder="password"
+            placeholderTextColor="#9BA1A6"
+            secureTextEntry
+            onChangeText={setPassword}
+            value={password}
+            style={styles.input}
+          />
+          <TouchableOpacity style={styles.button} onPress={signUpHandler}>
+            <Text style={styles.buttonText}>Sign Up</Text>
+          </TouchableOpacity>
+          {error ? <Text style={styles.error}>{error}</Text> : null}
+        </View>
+      </KeyboardAvoidingView>
+    </TouchableWithoutFeedback>
+  );
+}
+
+function formatError(code: string) {
+  switch (code) {
+    case "auth/email-already-exists":
+      return "User with this email already exists";
+    case "auth/invalid-email":
+      return "Please enter a valid email address";
+    case "auth/weak-password":
+      return "Password must be at least 6 characters.";
+    default:
+      return "Something went wrong, try again";
+  }
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 24,
+    backgroundColor: Colors.light.background,
+  },
+  card: {
+    gap: 12,
+  },
+  text: {
+    color: Colors.light.text,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "600",
+    color: Colors.light.tint,
+    textAlign: "center",
+    marginBottom: 4,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: Colors.light.icon,
+    textAlign: "center",
+    marginBottom: 16,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "#E0E0E0",
+    borderRadius: 10,
+    padding: 14,
+    fontSize: 16,
+    color: Colors.light.text,
+    backgroundColor: "#F9F9F9",
+  },
+  error: { color: "#D32F2F", fontSize: 14, textAlign: "center" },
+  button: {
+    backgroundColor: Colors.light.tint,
+    padding: 16,
+    borderRadius: 10,
+    alignItems: "center",
+    marginTop: 4,
+  },
+  buttonText: { color: "#fff", fontSize: 16, fontWeight: "600" },
+  linkRow: { alignItems: "center", marginTop: 8 },
+  link: { color: Colors.light.icon, fontSize: 14 },
+  linkBold: { color: Colors.light.tint, fontWeight: "600" },
+});
