@@ -3,13 +3,11 @@ import { useState } from "react";
 import { router } from "expo-router";
 import {
   View,
-  Keyboard,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
   Text,
   TextInput,
-  TouchableWithoutFeedback,
   TouchableOpacity,
 } from "react-native";
 import { Colors } from "@/constants/theme";
@@ -30,48 +28,49 @@ export default function Login() {
     signIn(email.trim(), password)
       .then(() => {
         console.log(user);
-        router.push('/'); 
+        router.push("/");
       })
       .catch((error: FirebaseError) => {
         console.log(error);
-        console.log('logging error');
+        console.log("logging error");
         setError(formatError(error.code));
       });
   }
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <KeyboardAvoidingView
-        style={styles.container}
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-      >
-        <View style={styles.card}>
-          <Text style={styles.title}>Log in to Emory Hacks</Text>
-          <TextInput
-            placeholder="email"
-            placeholderTextColor='#9BA1A6'
-            value={email}
-            onChangeText={setEmail}
-            style={styles.input}
-          />
-          <TextInput
-            placeholder="password"
-            placeholderTextColor='#9BA1A6'
-            secureTextEntry
-            onChangeText={setPassword}
-            value={password}
-            style={styles.input}
-          />
-          <TouchableOpacity style={styles.button} onPress={signInHandler}>
-            <Text style={styles.buttonText}>Sign In</Text>
-          </TouchableOpacity>
-          {error ? <Text style={styles.error}>{error}</Text> : null}
-          <View style={styles.linkRow}>
-            <Text onPress={() => router.push('/signup')} style={styles.link}>New to Emory Hacks? <Text style={styles.linkBold}>Create an account</Text></Text>
-          </View>
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+    >
+      <View style={styles.card}>
+        <Text style={styles.title}>Log in to Emory Hacks</Text>
+        <TextInput
+          placeholder="email"
+          placeholderTextColor="#9BA1A6"
+          value={email}
+          onChangeText={setEmail}
+          style={styles.input}
+        />
+        <TextInput
+          placeholder="password"
+          placeholderTextColor="#9BA1A6"
+          secureTextEntry
+          onChangeText={setPassword}
+          value={password}
+          style={styles.input}
+        />
+        <TouchableOpacity style={styles.button} onPress={signInHandler}>
+          <Text style={styles.buttonText}>Sign In</Text>
+        </TouchableOpacity>
+        {error ? <Text style={styles.error}>{error}</Text> : null}
+        <View style={styles.linkRow}>
+          <Text onPress={() => router.push("/signup")} style={styles.link}>
+            New to Emory Hacks?{" "}
+            <Text style={styles.linkBold}>Create an account</Text>
+          </Text>
         </View>
-      </KeyboardAvoidingView>
-    </TouchableWithoutFeedback>
+      </View>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -80,7 +79,7 @@ function formatError(code: string): string {
     case "auth/invalid-email":
       return "Please enter a valid email";
     case "auth/invalid-credential":
-      return "Incorrect email or password"
+      return "Incorrect email or password";
     default:
       return "something went wrong, please try again";
   }
@@ -95,6 +94,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.light.background,
   },
   card: {
+    width: "60%",
     gap: 12,
   },
   text: {
@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   buttonText: { color: "#fff", fontSize: 16, fontWeight: "600" },
-  linkRow: { alignItems: 'center', marginTop: 8 },
+  linkRow: { alignItems: "center", marginTop: 8 },
   link: { color: Colors.light.icon, fontSize: 14 },
-  linkBold: { color: Colors.light.tint, fontWeight: '600' },
+  linkBold: { color: Colors.light.tint, fontWeight: "600" },
 });

@@ -1,6 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -13,10 +14,12 @@ const firebaseConfig = {
   projectId: "emory-hacks-f3f9a",
   storageBucket: "emory-hacks-f3f9a.firebasestorage.app",
   messagingSenderId: "754783498331",
-  appId: "1:754783498331:web:9bb40ba0dd355156a5cf7e"
+  appId: "1:754783498331:web:9bb40ba0dd355156a5cf7e",
 };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-export const auth = getAuth(app)
+export const auth = getAuth(app);
+
+export const db = getFirestore(app);

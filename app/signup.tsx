@@ -3,13 +3,11 @@ import { useState } from "react";
 import { router } from "expo-router";
 import {
   View,
-  Keyboard,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
   Text,
   TextInput,
-  TouchableWithoutFeedback,
   TouchableOpacity,
 } from "react-native";
 import { Colors } from "@/constants/theme";
@@ -24,7 +22,7 @@ export default function SignUpScreen() {
   function signUpHandler() {
     if (!email || !password) {
       setError("please enter your email and password");
-      return; 
+      return;
     }
 
     signUp(email, password)
@@ -41,41 +39,45 @@ export default function SignUpScreen() {
   }
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <KeyboardAvoidingView
-        style={styles.container}
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-      >
-        <View style={styles.card}>
-          <Text style={styles.title}>Sign up to Emory Hacks</Text>
-          <TextInput
-            placeholder="email"
-            placeholderTextColor="#9BA1A6"
-            value={email}
-            onChangeText={setEmail}
-            style={styles.input}
-          />
-          <TextInput
-            placeholder="password"
-            placeholderTextColor="#9BA1A6"
-            secureTextEntry
-            onChangeText={setPassword}
-            value={password}
-            style={styles.input}
-          />
-          <TouchableOpacity style={styles.button} onPress={signUpHandler}>
-            <Text style={styles.buttonText}>Sign Up</Text>
-          </TouchableOpacity>
-          {error ? <Text style={styles.error}>{error}</Text> : null}
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+    >
+      <View style={styles.card}>
+        <Text style={styles.title}>Sign up to Emory Hacks</Text>
+        <TextInput
+          placeholder="email"
+          placeholderTextColor="#9BA1A6"
+          value={email}
+          onChangeText={setEmail}
+          style={styles.input}
+        />
+        <TextInput
+          placeholder="password"
+          placeholderTextColor="#9BA1A6"
+          secureTextEntry
+          onChangeText={setPassword}
+          value={password}
+          style={styles.input}
+        />
+        <TouchableOpacity style={styles.button} onPress={signUpHandler}>
+          <Text style={styles.buttonText}>Sign Up</Text>
+        </TouchableOpacity>
+        {error ? <Text style={styles.error}>{error}</Text> : null}
+        <View style={styles.linkRow}>
+          <Text onPress={() => router.push("/login")} style={styles.link}>
+            Already have an account?{" "}
+            <Text style={styles.linkBold}>Sign In</Text>
+          </Text>
         </View>
-      </KeyboardAvoidingView>
-    </TouchableWithoutFeedback>
+      </View>
+    </KeyboardAvoidingView>
   );
 }
 
 function formatError(code: string) {
   switch (code) {
-    case "auth/email-already-exists":
+    case "auth/email-already-in-use":
       return "User with this email already exists";
     case "auth/invalid-email":
       return "Please enter a valid email address";
@@ -95,6 +97,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.light.background,
   },
   card: {
+    width: "60%",
     gap: 12,
   },
   text: {
