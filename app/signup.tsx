@@ -15,17 +15,18 @@ import { FirebaseError } from "firebase/app";
 
 export default function SignUpScreen() {
   const { signUp } = useAuth();
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
   function signUpHandler() {
-    if (!email || !password) {
-      setError("please enter your email and password");
+    if (!email || !password || !name) {
+      setError("please enter your name, email and password");
       return;
     }
 
-    signUp(email, password)
+    signUp(name.trim(), email.trim(), password)
       .then(() => {
         console.log("signed Up");
         router.push("/");
@@ -45,6 +46,13 @@ export default function SignUpScreen() {
     >
       <View style={styles.card}>
         <Text style={styles.title}>Sign up to Emory Hacks</Text>
+        <TextInput
+          placeholder="name"
+          placeholderTextColor="#9BA1A6"
+          value={name}
+          onChangeText={setName}
+          style={styles.input}
+        />
         <TextInput
           placeholder="email"
           placeholderTextColor="#9BA1A6"

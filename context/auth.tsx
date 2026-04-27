@@ -15,7 +15,7 @@ type AuthContextType = {
   user: User | null;
   role: Role | null;
   loading: boolean;
-  signUp: (email: string, password: string) => Promise<void>;
+  signUp: (name: string, email: string, password: string) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
 };
@@ -54,18 +54,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return unsubscribe;
   }, []);
 
-  async function signUp(email: string, password: string) {
+  async function signUp(name: string, email: string, password: string) {
     let newUser: User | null = null;
     try {
       const cred = await createUserWithEmailAndPassword(auth, email, password);
       newUser = cred.user;
-
-      await setDoc(doc(db, "users", newUser.uid), {
+      const newUserDoc: UserDoc = {
+        name: name,
         email: newUser.email ?? "",
         role: "participant",
         score: 0,
         checkedIn: false,
-      });
+      }
+
+      await setDoc(doc(db, "users", newUser.uid), newUserDoc);
     } catch (e) {
       if (newUser) {
         await newUser.delete();

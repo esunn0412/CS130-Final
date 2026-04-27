@@ -47,9 +47,9 @@ export default function HomeScreen() {
     return unsubscribe;
   }, [user]);
 
-  console.log('render user: ', user?.email ?? 'null');
+  console.log("render user: ", user?.email ?? "null");
   if (loading) return null;
-  
+
   if (!user) {
     return <Redirect href="/login" />;
   }
@@ -69,7 +69,13 @@ export default function HomeScreen() {
           <View style={styles.profileTop}>
             <View style={{ flex: 1 }}>
               <Text
-                style={[styles.emailText, { color: c.text }]}
+                style={[styles.nameText, { color: c.text }]}
+                numberOfLines={1}
+              >
+                {userDoc?.name}
+              </Text>
+              <Text
+                style={[styles.emailText, { color: c.muted }]}
                 numberOfLines={1}
               >
                 {user?.email}
@@ -116,7 +122,7 @@ export default function HomeScreen() {
               </View>
             </View>
 
-            <View style={{ alignItems: "flex-end", gap: 10 }}>
+            <View style={{ alignItems: "flex-end", display: "flex", paddingBottom: 4}}>
               <View style={styles.scoreBox}>
                 <Text style={[styles.scoreNum, { color: c.tint }]}>
                   {userDoc?.score ?? 0}
@@ -155,11 +161,12 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   profileTop: { flexDirection: "row", gap: 12 },
-  emailText: { fontSize: 16, fontWeight: "600", marginBottom: 8 },
+  nameText: { fontSize: 24, fontWeight: "600" },
+  emailText: { fontSize: 12, fontWeight: "600", marginBottom: 20 },
   badgeRow: { flexDirection: "row", flexWrap: "wrap", gap: 6 },
-  badge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20 },
+  badge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 6 },
   badgeText: { fontSize: 12, fontWeight: "600" },
-  scoreBox: { flexDirection: "row", alignItems: "baseline" },
+  scoreBox: { flexDirection: "row", alignItems: "baseline", flex: 1},
   scoreNum: { fontSize: 28, fontWeight: "800" },
   scorePts: { fontSize: 13, fontWeight: "500" },
   signOutRow: { flexDirection: "row", alignItems: "center", gap: 4 },

@@ -29,11 +29,13 @@ export default function Login() {
       .then(() => {
         console.log(user);
         router.push("/");
+        return;
       })
       .catch((error: FirebaseError) => {
         console.log(error);
         console.log("logging error");
         setError(formatError(error.code));
+        return;
       });
   }
 
