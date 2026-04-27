@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.light.background,
   },
   card: {
-    width: "60%",
+    width: "80%",
     gap: 12,
   },
   text: {

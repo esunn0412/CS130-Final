@@ -14,6 +14,7 @@ import { Role, UserDoc } from "@/types/db";
 type AuthContextType = {
   user: User | null;
   role: Role | null;
+  loading: boolean;
   signUp: (email: string, password: string) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
@@ -24,9 +25,15 @@ const AuthContext = createContext<AuthContextType | null>(null);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [role, setRole] = useState<Role | null>("participant");
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      setLoading(true);
+      console.log(
+        "auth state on authstatechange:",
+        firebaseUser?.email ?? "null",
+      );
       if (firebaseUser) {
         onSnapshot(doc(db, "users", firebaseUser.uid), (snap) => {
           if (snap.exists()) {
@@ -42,6 +49,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(null);
         setRole(null);
       }
+      setLoading(false);
     });
     return unsubscribe;
   }, []);
@@ -71,12 +79,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await signInWithEmailAndPassword(auth, email, password);
   }
 
-  function signOut() {
-    return firebaseSignOut(auth);
+  async function signOut() {
+    await firebaseSignOut(auth);
   }
 
   return (
-    <AuthContext.Provider value={{ user, role, signUp, signIn, signOut }}>
+    <AuthContext.Provider
+      value={{ user, role, loading, signUp, signIn, signOut }}
+    >
       {children}
     </AuthContext.Provider>
   );

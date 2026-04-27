@@ -33,7 +33,7 @@ function colors(scheme: "light" | "dark") {
 export default function HomeScreen() {
   const color = useColorScheme();
   const c = colors(color ?? "light");
-  const { user, role, signOut } = useAuth();
+  const { loading, user, role, signOut } = useAuth();
   const [userDoc, setUserDoc] = useState<UserDoc | null>(null);
 
   useEffect(() => {
@@ -47,6 +47,9 @@ export default function HomeScreen() {
     return unsubscribe;
   }, [user]);
 
+  console.log('render user: ', user?.email ?? 'null');
+  if (loading) return null;
+  
   if (!user) {
     return <Redirect href="/login" />;
   }
