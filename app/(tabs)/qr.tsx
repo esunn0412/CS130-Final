@@ -11,6 +11,7 @@ import { useAuth } from "@/context/auth";
 import { db } from "@/firebaseConfig";
 import { useColorScheme } from "@/hooks/use-color-scheme.web";
 import { UserDoc } from "@/types/db";
+import { useIsFocused } from "@react-navigation/native";
 
 import { doc, onSnapshot } from "firebase/firestore";
 
@@ -22,6 +23,7 @@ function AdminScreen({ c }: { c: (typeof Colors)["dark"] }) {
   const [state, setState] = useState<State>("scanning");
   const [scannedUser, setScannedUser] = useState<ScannedUser | null>(null);
   const [errMsg, setErrMsg] = useState("");
+  const isFocused = useIsFocused();
 
   function handleScan({ data }: { data: string }) {
     const unsubscribe = onSnapshot(
@@ -75,12 +77,14 @@ function AdminScreen({ c }: { c: (typeof Colors)["dark"] }) {
   if (state === "scanning") {
     return (
       <View style={{ flex: 1 }}>
-        <CameraView
-          style={{ flex: 1 }}
-          barcodeScannerSettings={{ barcodeTypes: ["qr"] }}
-          facing="back"
-          onBarcodeScanned={handleScan}
-        />
+        {isFocused && (
+          <CameraView
+            style={{ flex: 1 }}
+            barcodeScannerSettings={{ barcodeTypes: ["qr"] }}
+            facing="back"
+            onBarcodeScanned={handleScan}
+          />
+        )}
         <View style={styles.scanOverlay}>
           <View style={[styles.scanFrame, { borderColor: c.tint }]} />
           <Text style={styles.scanHint}>
@@ -185,7 +189,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   scanOverlay: {
-    position: 'absolute',
+    position: "absolute",
     top: 0,
     right: 0,
     left: 0,
@@ -195,11 +199,19 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   scanFrame: {
-    width: 280, height: 280, borderWidth: 3, borderRadius: 16,
+    width: 280,
+    height: 280,
+    borderWidth: 3,
+    borderRadius: 16,
   },
   scanHint: {
-    color: '#fff', fontSize: 14, textAlign: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 8,
+    color: "#fff",
+    fontSize: 14,
+    textAlign: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 8,
   },
   passLabel: {
     fontSize: 20,
