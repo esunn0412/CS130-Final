@@ -119,6 +119,44 @@ function AdminScreen({ c }: { c: (typeof Colors)["dark"] }) {
   );
 }
 
+function ParticipantScreen({ c }: { c: (typeof Colors)["dark"] }) {
+  const { user } = useAuth();
+  return (
+    <View
+      style={[
+        styles.center,
+        { backgroundColor: c.background, gap: 16, padding: 24 },
+      ]}
+    >
+      <Text style={[styles.passLabel, { color: c.text }]}>Your QR Code</Text>
+      <View
+        style={[
+          styles.qrBox,
+          { backgroundColor: c.cardBg, borderColor: c.cardBorder },
+        ]}
+      >
+        {user?.uid ? (
+          <QRCode
+            value={user.uid}
+            size={250}
+            color={c.qrFg}
+            backgroundColor={c.cardBg}
+          />
+        ) : (
+          // <ActivityIndicator color={c.tint} />
+          <Text>Not ready yet!</Text>
+        )}
+      </View>
+      <Text style={{ fontSize: 14, color: c.tabIconDefault }}>
+        {user?.email}
+      </Text>
+      <Text style={{ fontSize: 13, color: c.muted, textAlign: "center" }}>
+        Show this to the Emory Hacks team to check in.
+      </Text>
+    </View>
+  );
+}
+
 export default function QRScreen() {
   const { user, loading, role } = useAuth();
   const c = Colors[useColorScheme() ?? "light"];
