@@ -118,7 +118,7 @@ function AdminScreen({ c }: { c: (typeof Colors)["dark"] }) {
 
   return (
     <View style={[styles.resultContainer, { backgroundColor: c.background }]}>
-      {scannedUser?.email}
+      <Text style={styles.passLabel}>{scannedUser?.email}</Text>
     </View>
   );
 }
@@ -173,7 +173,7 @@ export default function QRScreen() {
       style={{ flex: 1, backgroundColor: c.background }}
       edges={["top"]}
     >
-      {user && role === "admin" ? (
+      {user && role === "participant" ? (
         <ParticipantScreen c={c} />
       ) : (
         <AdminScreen c={c} />
