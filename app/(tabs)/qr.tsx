@@ -13,7 +13,7 @@ import { useColorScheme } from "@/hooks/use-color-scheme.web";
 import { UserDoc } from "@/types/db";
 import { useIsFocused } from "@react-navigation/native";
 
-import { doc, onSnapshot, setDoc, updateDoc } from "firebase/firestore";
+import { doc, onSnapshot, updateDoc } from "firebase/firestore";
 
 type ScannedUser = UserDoc & { uid: string };
 type State = "scanning" | "error" | "result";
@@ -86,7 +86,7 @@ function AdminScreen({ c }: { c: (typeof Colors)["dark"] }) {
           />
         )}
         <View style={styles.scanOverlay}>
-          <View style={[styles.scanFrame, { borderColor: c.tint }]} />
+          <View style={styles.scanFrame} />
           <Text style={styles.scanHint}>
             Point the camera at participant's QR code
           </Text>
@@ -125,7 +125,19 @@ function AdminScreen({ c }: { c: (typeof Colors)["dark"] }) {
     );
   }
 
+  function updateScore(delta: number) {
+    if (!scannedUser) return;
+    const newScore = scannedUser.score + delta;
+    updateDoc(doc(db, "users", scannedUser.uid), { score: newScore }).then(
+      () => {
+        console.log(`updated score to ${newScore}`);
+        setScannedUser({ ...scannedUser, score: newScore });
+      },
+    );
+  }
+
   if (!scannedUser) return null;
+  const control = [-10, -5, 5, 10];
 
   return (
     <View style={[styles.resultContainer, { backgroundColor: c.background }]}>
@@ -144,7 +156,7 @@ function AdminScreen({ c }: { c: (typeof Colors)["dark"] }) {
           }}
         >
           <Text style={{ color: c.text, fontSize: 17, fontWeight: "700" }}>
-            {scannedUser.email}
+            {`${scannedUser.name} | ${scannedUser.email}`}
           </Text>
           <View
             style={[
@@ -168,7 +180,7 @@ function AdminScreen({ c }: { c: (typeof Colors)["dark"] }) {
 
         <View style={{ backgroundColor: c.cardBorder, height: 1 }} />
 
-        <View style={{ gap: 10 }}>
+        <View style={{ gap: 12 }}>
           <View
             style={{
               flexDirection: "row",
@@ -188,6 +200,42 @@ function AdminScreen({ c }: { c: (typeof Colors)["dark"] }) {
             <Text style={{ fontSize: 20, fontWeight: "700", color: c.text }}>
               {scannedUser.score ?? 0}
             </Text>
+          </View>
+          <View
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "space-between",
+              gap: 8,
+            }}
+          >
+            {control.map((delta) => {
+              return (
+                <TouchableOpacity
+                  style={[
+                    styles.btn,
+                    {
+                      flex: 1,
+                      paddingVertical: 10,
+                      borderWidth: 1,
+                      borderRadius: 10,
+                      borderColor: c.cardBorder,
+                      backgroundColor: delta > 0 ? "#D1FAE5" : "#FEE2E2",
+                    },
+                  ]}
+                  onPress={() => updateScore(delta)}
+                >
+                  <Text
+                    style={[
+                      styles.btnText,
+                      { color: delta > 0 ? "#065F46" : "#991B1B" },
+                    ]}
+                  >
+                    {delta > 0 ? `+${delta}` : delta}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
           </View>
         </View>
       </View>
@@ -297,6 +345,7 @@ const styles = StyleSheet.create({
     height: 280,
     borderWidth: 3,
     borderRadius: 16,
+    borderColor: Colors.dark.text
   },
   scanHint: {
     color: "#fff",

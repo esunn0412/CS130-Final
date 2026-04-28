@@ -111,21 +111,12 @@ const styles = StyleSheet.create({
     width: "80%",
     gap: 12,
   },
-  text: {
-    color: Colors.light.text,
-  },
   title: {
     fontSize: 24,
     fontWeight: "600",
     color: Colors.light.tint,
     textAlign: "center",
     marginBottom: 4,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: Colors.light.tabIconDefault,
-    textAlign: "center",
-    marginBottom: 16,
   },
   input: {
     borderWidth: 1,

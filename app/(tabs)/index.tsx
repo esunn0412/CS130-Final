@@ -118,12 +118,12 @@ export default function HomeScreen() {
                 paddingBottom: 4,
               }}
             >
-              <View style={styles.scoreBox}>
+              {role === 'participant' && <View style={styles.scoreBox}>
                 <Text style={[styles.scoreNum, { color: c.tint }]}>
                   {userDoc?.score ?? 0}
                 </Text>
                 <Text style={[styles.scorePts, { color: c.muted }]}> pts</Text>
-              </View>
+              </View>}
               <TouchableOpacity onPress={signOut} style={styles.signOutRow}>
                 <Text style={[styles.signOutText, { color: c.muted }]}>
                   Sign out
