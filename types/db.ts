@@ -4,6 +4,7 @@ export type UserDoc = {
   role: Role;
   score: number;
   checkedIn: boolean;
+  qrCode: string;
 };
 
 export type Role = "participant" | "admin";

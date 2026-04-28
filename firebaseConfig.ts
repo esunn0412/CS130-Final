@@ -1,9 +1,13 @@
 import { initializeApp } from "firebase/app";
-// @ts-expect-error - getReactNativePersistence exists in the RN bundle but is missing from web types
-import { getReactNativePersistence, initializeAuth } from "firebase/auth";
-
+import {
+  getAuth,
+  initializeAuth,
+  // @ts-expect-error RN bundle (see metro.config.js); not listed in firebase/auth web typings
+  getReactNativePersistence,
+} from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Platform } from "react-native";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -22,8 +26,11 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-export const auth = initializeAuth(app, {
-  persistence: getReactNativePersistence(AsyncStorage),
-});
+export const auth =
+  Platform.OS === "web"
+    ? getAuth(app)
+    : initializeAuth(app, {
+        persistence: getReactNativePersistence(AsyncStorage),
+      });
 
 export const db = getFirestore(app);
