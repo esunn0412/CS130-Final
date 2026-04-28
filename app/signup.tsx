@@ -1,16 +1,19 @@
-import { useAuth } from "@/context/auth";
 import { useState } from "react";
-import { router } from "expo-router";
 import {
-  View,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
+  View,
 } from "react-native";
+
+import { router } from "expo-router";
+
 import { Colors } from "@/constants/theme";
+import { useAuth } from "@/context/auth";
+
 import { FirebaseError } from "firebase/app";
 
 export default function SignUpScreen() {

@@ -1,21 +1,23 @@
+import { useEffect, useState } from "react";
 import {
-  View,
-  Text,
   ScrollView,
   StyleSheet,
+  Text,
   TouchableOpacity,
+  View,
 } from "react-native";
-
-import { useAuth } from "@/context/auth";
-import { Redirect } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Colors } from "@/constants/theme";
+
+import { Redirect } from "expo-router";
+
 import { IconSymbol } from "@/components/ui/icon-symbol";
-import { useColorScheme } from "@/hooks/use-color-scheme.web";
-import { useState, useEffect } from "react";
-import { doc, onSnapshot } from "firebase/firestore";
+import { Colors } from "@/constants/theme";
+import { useAuth } from "@/context/auth";
 import { db } from "@/firebaseConfig";
+import { useColorScheme } from "@/hooks/use-color-scheme.web";
 import { UserDoc } from "@/types/db";
+
+import { doc, onSnapshot } from "firebase/firestore";
 
 export default function HomeScreen() {
   const color = useColorScheme();
@@ -109,7 +111,13 @@ export default function HomeScreen() {
               </View>
             </View>
 
-            <View style={{ alignItems: "flex-end", display: "flex", paddingBottom: 4}}>
+            <View
+              style={{
+                alignItems: "flex-end",
+                display: "flex",
+                paddingBottom: 4,
+              }}
+            >
               <View style={styles.scoreBox}>
                 <Text style={[styles.scoreNum, { color: c.tint }]}>
                   {userDoc?.score ?? 0}
@@ -153,7 +161,7 @@ const styles = StyleSheet.create({
   badgeRow: { flexDirection: "row", flexWrap: "wrap", gap: 6 },
   badge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 6 },
   badgeText: { fontSize: 12, fontWeight: "600" },
-  scoreBox: { flexDirection: "row", alignItems: "baseline", flex: 1},
+  scoreBox: { flexDirection: "row", alignItems: "baseline", flex: 1 },
   scoreNum: { fontSize: 28, fontWeight: "800" },
   scorePts: { fontSize: 13, fontWeight: "500" },
   signOutRow: { flexDirection: "row", alignItems: "center", gap: 4 },

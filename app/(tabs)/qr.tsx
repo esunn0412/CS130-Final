@@ -13,7 +13,7 @@ import { useColorScheme } from "@/hooks/use-color-scheme.web";
 import { UserDoc } from "@/types/db";
 import { useIsFocused } from "@react-navigation/native";
 
-import { doc, onSnapshot } from "firebase/firestore";
+import { doc, onSnapshot, setDoc, updateDoc } from "firebase/firestore";
 
 type ScannedUser = UserDoc & { uid: string };
 type State = "scanning" | "error" | "result";
@@ -116,9 +116,103 @@ function AdminScreen({ c }: { c: (typeof Colors)["dark"] }) {
     );
   }
 
+  function checkIn() {
+    if (!scannedUser) return;
+    updateDoc(doc(db, "users", scannedUser.uid), { checkedIn: true }).then(
+      () => {
+        setScannedUser({ ...scannedUser, checkedIn: true });
+      },
+    );
+  }
+
+  if (!scannedUser) return null;
+
   return (
     <View style={[styles.resultContainer, { backgroundColor: c.background }]}>
-      <Text style={styles.passLabel}>{scannedUser?.email}</Text>
+      <View
+        style={[
+          styles.card,
+          { backgroundColor: c.cardBg, borderColor: c.cardBorder },
+        ]}
+      >
+        <View
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <Text style={{ color: c.text, fontSize: 17, fontWeight: "700" }}>
+            {scannedUser.email}
+          </Text>
+          <View
+            style={[
+              styles.badge,
+              {
+                backgroundColor: scannedUser.checkedIn ? "#D1FAE5" : "#F3F4F6",
+              },
+            ]}
+          >
+            <Text
+              style={{
+                fontSize: 12,
+                fontWeight: "500",
+                color: scannedUser.checkedIn ? "#065F46" : "#6B7280",
+              }}
+            >
+              {scannedUser.checkedIn ? "Checked In" : "Not Checked In"}
+            </Text>
+          </View>
+        </View>
+
+        <View style={{ backgroundColor: c.cardBorder, height: 1 }} />
+
+        <View style={{ gap: 10 }}>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 15,
+                fontWeight: "500",
+                color: c.tabIconDefault,
+              }}
+            >
+              Score
+            </Text>
+            <Text style={{ fontSize: 20, fontWeight: "700", color: c.text }}>
+              {scannedUser.score ?? 0}
+            </Text>
+          </View>
+        </View>
+      </View>
+
+      {!scannedUser.checkedIn && (
+        <TouchableOpacity
+          style={[styles.btn, { backgroundColor: c.text }]}
+          onPress={checkIn}
+        >
+          <Text
+            style={{ fontSize: 15, fontWeight: "500", color: c.background }}
+          >
+            Check In
+          </Text>
+        </TouchableOpacity>
+      )}
+
+      <TouchableOpacity
+        style={[styles.btn, { backgroundColor: c.tint }]}
+        onPress={reset}
+      >
+        <Text style={{ fontSize: 15, fontWeight: "500", color: c.background }}>
+          Scan Another
+        </Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -232,6 +326,23 @@ const styles = StyleSheet.create({
     padding: 20,
     gap: 14,
     justifyContent: "center",
+  },
+  card: {
+    borderRadius: 14,
+    borderWidth: 1,
+    padding: 18,
+    gap: 14,
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 2,
+  },
+  badge: {
+    alignSelf: "flex-start",
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 6,
   },
   btn: {
     padding: 15,
