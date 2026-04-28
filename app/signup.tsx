@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 16,
-    color: Colors.light.icon,
+    color: Colors.light.tabIconDefault,
     textAlign: "center",
     marginBottom: 16,
   },
@@ -143,6 +143,6 @@ const styles = StyleSheet.create({
   },
   buttonText: { color: "#fff", fontSize: 16, fontWeight: "600" },
   linkRow: { alignItems: "center", marginTop: 8 },
-  link: { color: Colors.light.icon, fontSize: 14 },
+  link: { color: Colors.light.tabIconDefault, fontSize: 14 },
   linkBold: { color: Colors.light.tint, fontWeight: "600" },
 });

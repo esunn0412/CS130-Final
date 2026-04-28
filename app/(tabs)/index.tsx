@@ -17,22 +17,9 @@ import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "@/firebaseConfig";
 import { UserDoc } from "@/types/db";
 
-function colors(scheme: "light" | "dark") {
-  const isDark = scheme === "dark";
-  return {
-    bg: Colors[scheme].background,
-    text: Colors[scheme].text,
-    icon: Colors[scheme].icon,
-    tint: Colors[scheme].tint,
-    muted: isDark ? "#6B7280" : "#9BA1A6",
-    cardBg: isDark ? "#1E2325" : "#ffffff",
-    cardBorder: isDark ? "#2C3032" : "#E8E8E8",
-  };
-}
-
 export default function HomeScreen() {
   const color = useColorScheme();
-  const c = colors(color ?? "light");
+  const c = Colors[color ?? "light"];
   const { loading, user, role, signOut } = useAuth();
   const [userDoc, setUserDoc] = useState<UserDoc | null>(null);
 
