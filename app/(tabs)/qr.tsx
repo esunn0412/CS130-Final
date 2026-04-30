@@ -13,10 +13,10 @@ import { useColorScheme } from "@/hooks/use-color-scheme.web";
 import { UserDoc } from "@/types/db";
 import { useIsFocused } from "@react-navigation/native";
 
-import { doc, onSnapshot, updateDoc } from "firebase/firestore";
+import { doc, getDoc, onSnapshot, updateDoc } from "firebase/firestore";
 
 type ScannedUser = UserDoc & { uid: string };
-type State = "scanning" | "error" | "result";
+type State = "scanning" | "loading" | "error" | "result";
 
 function AdminScreen({ c }: { c: (typeof Colors)["dark"] }) {
   const [permissions, requestPermission] = useCameraPermissions();
@@ -26,23 +26,23 @@ function AdminScreen({ c }: { c: (typeof Colors)["dark"] }) {
   const isFocused = useIsFocused();
 
   function handleScan({ data }: { data: string }) {
-    const unsubscribe = onSnapshot(
-      doc(db, "users", data),
-      (snap) => {
+    if (state !== "scanning") return;
+    setState("loading");
+
+    getDoc(doc(db, "users", data))
+      .then((snap) => {
         if (!snap.exists()) return;
 
         const scannedUserDoc = snap.data() as UserDoc;
         setScannedUser({ uid: data, ...scannedUserDoc });
         setState("result");
-      },
-      (e) => {
+      })
+      .catch((e) => {
         console.log(e);
         setState("error");
         setErrMsg(e.message);
-      },
-    );
-
-    return unsubscribe;
+      });
+    return;
   }
 
   function reset() {
@@ -50,6 +50,26 @@ function AdminScreen({ c }: { c: (typeof Colors)["dark"] }) {
     setScannedUser(null);
     setErrMsg("");
     return;
+  }
+
+  function checkIn() {
+    if (!scannedUser) return;
+    updateDoc(doc(db, "users", scannedUser.uid), { checkedIn: true }).then(
+      () => {
+        setScannedUser({ ...scannedUser, checkedIn: true });
+      },
+    );
+  }
+
+  function updateScore(delta: number) {
+    if (!scannedUser) return;
+    const newScore = scannedUser.score + delta;
+    updateDoc(doc(db, "users", scannedUser.uid), { score: newScore }).then(
+      () => {
+        console.log(`updated score to ${newScore}`);
+        setScannedUser({ ...scannedUser, score: newScore });
+      },
+    );
   }
 
   if (!permissions) return null;
@@ -74,7 +94,7 @@ function AdminScreen({ c }: { c: (typeof Colors)["dark"] }) {
     );
   }
 
-  if (state === "scanning") {
+  if (state === "scanning" || state === "loading") {
     return (
       <View style={{ flex: 1 }}>
         {isFocused && (
@@ -88,7 +108,7 @@ function AdminScreen({ c }: { c: (typeof Colors)["dark"] }) {
         <View style={styles.scanOverlay}>
           <View style={styles.scanFrame} />
           <Text style={styles.scanHint}>
-            Point the camera at participant's QR code
+            {state === "scanning" ? "Point the camera at participant's QR code" : "Fetching Participant..."}
           </Text>
         </View>
       </View>
@@ -116,26 +136,6 @@ function AdminScreen({ c }: { c: (typeof Colors)["dark"] }) {
     );
   }
 
-  function checkIn() {
-    if (!scannedUser) return;
-    updateDoc(doc(db, "users", scannedUser.uid), { checkedIn: true }).then(
-      () => {
-        setScannedUser({ ...scannedUser, checkedIn: true });
-      },
-    );
-  }
-
-  function updateScore(delta: number) {
-    if (!scannedUser) return;
-    const newScore = scannedUser.score + delta;
-    updateDoc(doc(db, "users", scannedUser.uid), { score: newScore }).then(
-      () => {
-        console.log(`updated score to ${newScore}`);
-        setScannedUser({ ...scannedUser, score: newScore });
-      },
-    );
-  }
-
   if (!scannedUser) return null;
   const control = [-10, -5, 5, 10];
 
@@ -149,7 +149,6 @@ function AdminScreen({ c }: { c: (typeof Colors)["dark"] }) {
       >
         <View
           style={{
-            display: "flex",
             flexDirection: "row",
             justifyContent: "space-between",
             alignItems: "center",
@@ -203,7 +202,6 @@ function AdminScreen({ c }: { c: (typeof Colors)["dark"] }) {
           </View>
           <View
             style={{
-              display: "flex",
               flexDirection: "row",
               justifyContent: "space-between",
               gap: 8,
@@ -345,7 +343,7 @@ const styles = StyleSheet.create({
     height: 280,
     borderWidth: 3,
     borderRadius: 16,
-    borderColor: Colors.dark.text
+    borderColor: Colors.dark.text,
   },
   scanHint: {
     color: "#fff",
