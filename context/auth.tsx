@@ -5,6 +5,7 @@ import {
   signInWithEmailAndPassword,
   signOut as firebaseSignOut,
   User,
+  Unsubscribe,
 } from "firebase/auth";
 import { createContext, useContext, useState, useEffect } from "react";
 import { db } from "@/firebaseConfig";
@@ -28,24 +29,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
+    let unsubscribeSnapshot : Unsubscribe | null = null; 
+
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       setLoading(true);
-      console.log(
-        "auth state on authstatechange:",
-        firebaseUser?.email ?? "null",
-      );
+      // console.log(
+      //   "auth state on authstatechange:",
+      //   firebaseUser?.email ?? "null",
+      // );
       if (firebaseUser) {
-        onSnapshot(doc(db, "users", firebaseUser.uid), (snap) => {
+        unsubscribeSnapshot = onSnapshot(doc(db, "users", firebaseUser.uid), (snap) => {
           if (snap.exists()) {
             const data = snap.data() as UserDoc;
             setRole(data.role ?? "participant");
           }
         });
-        // console.log("user is signed in")
-        console.log(firebaseUser);
+        // console.log(firebaseUser);
         setUser(firebaseUser);
       } else {
-        // console.log("user is signed out")
+        unsubscribeSnapshot?.()
+        unsubscribeSnapshot = null;
         setUser(null);
         setRole(null);
       }

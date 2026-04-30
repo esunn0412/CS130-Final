@@ -1,16 +1,19 @@
-import { useAuth } from "@/context/auth";
 import { useState } from "react";
-import { router } from "expo-router";
 import {
-  View,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
+  View,
 } from "react-native";
+
+import { router } from "expo-router";
+
 import { Colors } from "@/constants/theme";
+import { useAuth } from "@/context/auth";
+
 import { FirebaseError } from "firebase/app";
 
 export default function SignUpScreen() {
@@ -108,21 +111,12 @@ const styles = StyleSheet.create({
     width: "80%",
     gap: 12,
   },
-  text: {
-    color: Colors.light.text,
-  },
   title: {
     fontSize: 24,
     fontWeight: "600",
     color: Colors.light.tint,
     textAlign: "center",
     marginBottom: 4,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: Colors.light.icon,
-    textAlign: "center",
-    marginBottom: 16,
   },
   input: {
     borderWidth: 1,
@@ -143,6 +137,6 @@ const styles = StyleSheet.create({
   },
   buttonText: { color: "#fff", fontSize: 16, fontWeight: "600" },
   linkRow: { alignItems: "center", marginTop: 8 },
-  link: { color: Colors.light.icon, fontSize: 14 },
+  link: { color: Colors.light.tabIconDefault, fontSize: 14 },
   linkBold: { color: Colors.light.tint, fontWeight: "600" },
 });

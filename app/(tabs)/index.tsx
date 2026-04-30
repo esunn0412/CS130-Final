@@ -1,38 +1,27 @@
+import { useEffect, useState } from "react";
 import {
-  View,
-  Text,
   ScrollView,
   StyleSheet,
+  Text,
   TouchableOpacity,
+  View,
 } from "react-native";
-
-import { useAuth } from "@/context/auth";
-import { Redirect } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Colors } from "@/constants/theme";
+
+import { Redirect } from "expo-router";
+
 import { IconSymbol } from "@/components/ui/icon-symbol";
-import { useColorScheme } from "@/hooks/use-color-scheme.web";
-import { useState, useEffect } from "react";
-import { doc, onSnapshot } from "firebase/firestore";
+import { Colors } from "@/constants/theme";
+import { useAuth } from "@/context/auth";
 import { db } from "@/firebaseConfig";
+import { useColorScheme } from "@/hooks/use-color-scheme.web";
 import { UserDoc } from "@/types/db";
 
-function colors(scheme: "light" | "dark") {
-  const isDark = scheme === "dark";
-  return {
-    bg: Colors[scheme].background,
-    text: Colors[scheme].text,
-    icon: Colors[scheme].icon,
-    tint: Colors[scheme].tint,
-    muted: isDark ? "#6B7280" : "#9BA1A6",
-    cardBg: isDark ? "#1E2325" : "#ffffff",
-    cardBorder: isDark ? "#2C3032" : "#E8E8E8",
-  };
-}
+import { doc, onSnapshot } from "firebase/firestore";
 
 export default function HomeScreen() {
   const color = useColorScheme();
-  const c = colors(color ?? "light");
+  const c = Colors[color ?? "light"];
   const { loading, user, role, signOut } = useAuth();
   const [userDoc, setUserDoc] = useState<UserDoc | null>(null);
 
@@ -122,13 +111,19 @@ export default function HomeScreen() {
               </View>
             </View>
 
-            <View style={{ alignItems: "flex-end", display: "flex", paddingBottom: 4}}>
-              <View style={styles.scoreBox}>
+            <View
+              style={{
+                alignItems: "flex-end",
+                display: "flex",
+                paddingBottom: 4,
+              }}
+            >
+              {role === 'participant' && <View style={styles.scoreBox}>
                 <Text style={[styles.scoreNum, { color: c.tint }]}>
                   {userDoc?.score ?? 0}
                 </Text>
                 <Text style={[styles.scorePts, { color: c.muted }]}> pts</Text>
-              </View>
+              </View>}
               <TouchableOpacity onPress={signOut} style={styles.signOutRow}>
                 <Text style={[styles.signOutText, { color: c.muted }]}>
                   Sign out
@@ -166,7 +161,7 @@ const styles = StyleSheet.create({
   badgeRow: { flexDirection: "row", flexWrap: "wrap", gap: 6 },
   badge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 6 },
   badgeText: { fontSize: 12, fontWeight: "600" },
-  scoreBox: { flexDirection: "row", alignItems: "baseline", flex: 1},
+  scoreBox: { flexDirection: "row", alignItems: "baseline", flex: 1 },
   scoreNum: { fontSize: 28, fontWeight: "800" },
   scorePts: { fontSize: 13, fontWeight: "500" },
   signOutRow: { flexDirection: "row", alignItems: "center", gap: 4 },
