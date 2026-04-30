@@ -1,16 +1,17 @@
-import { auth } from "@/firebaseConfig";
+import { createContext, useContext, useEffect, useState } from "react";
+
+import { auth, db } from "@/firebaseConfig";
+import { Role, UserDoc } from "@/types/db";
+
 import {
+  Unsubscribe,
+  User,
   createUserWithEmailAndPassword,
+  signOut as firebaseSignOut,
   onAuthStateChanged,
   signInWithEmailAndPassword,
-  signOut as firebaseSignOut,
-  User,
-  Unsubscribe,
 } from "firebase/auth";
-import { createContext, useContext, useState, useEffect } from "react";
-import { db } from "@/firebaseConfig";
 import { doc, onSnapshot, setDoc } from "firebase/firestore";
-import { Role, UserDoc } from "@/types/db";
 
 type AuthContextType = {
   user: User | null;
@@ -29,25 +30,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    let unsubscribeSnapshot : Unsubscribe | null = null; 
+    let unsubscribeSnapshot: Unsubscribe | null = null;
 
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-      setLoading(true);
       // console.log(
       //   "auth state on authstatechange:",
       //   firebaseUser?.email ?? "null",
       // );
+      unsubscribeSnapshot?.();
       if (firebaseUser) {
-        unsubscribeSnapshot = onSnapshot(doc(db, "users", firebaseUser.uid), (snap) => {
-          if (snap.exists()) {
-            const data = snap.data() as UserDoc;
-            setRole(data.role ?? "participant");
-          }
-        });
+        unsubscribeSnapshot = onSnapshot(
+          doc(db, "users", firebaseUser.uid),
+          (snap) => {
+            if (snap.exists()) {
+              const data = snap.data() as UserDoc;
+              setRole(data.role ?? "participant");
+            }
+          },
+        );
         // console.log(firebaseUser);
         setUser(firebaseUser);
       } else {
-        unsubscribeSnapshot?.()
         unsubscribeSnapshot = null;
         setUser(null);
         setRole(null);
@@ -68,7 +71,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         role: "participant",
         score: 0,
         checkedIn: false,
-      }
+      };
 
       await setDoc(doc(db, "users", newUser.uid), newUserDoc);
     } catch (e) {
