@@ -1,0 +1,37 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAdmin() {
+      return request.auth != null
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    match /users/{uid} {
+      // Users read their own doc, admins can read any doc (needed for scanner lookup)
+      allow read: if request.auth != null
+        && (request.auth.uid == uid || isAdmin());
+
+      // on registration, all users' role is locked to 'participant'
+      allow create: if request.auth != null
+        && request.auth.uid == uid
+        && request.resource.data.role == 'participant';
+
+      // admins can update checkedIn and score
+      allow update: if isAdmin();
+
+      allow delete: if false;
+    }
+
+    match /announcements/{id} {
+      allow read: if request.auth != null;
+      allow write: if isAdmin();
+    }
+
+    match /schedule/{id} {
+      allow read: if request.auth != null;
+      allow write: if isAdmin();
+    }
+  }
+}
