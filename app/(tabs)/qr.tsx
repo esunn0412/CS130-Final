@@ -13,7 +13,7 @@ import { useColorScheme } from "@/hooks/use-color-scheme.web";
 import { UserDoc } from "@/types/db";
 import { useIsFocused } from "@react-navigation/native";
 
-import { doc, getDoc, onSnapshot, updateDoc } from "firebase/firestore";
+import { doc, getDoc, increment, updateDoc } from "firebase/firestore";
 
 type ScannedUser = UserDoc & { uid: string };
 type State = "scanning" | "loading" | "error" | "result";
@@ -22,6 +22,7 @@ function AdminScreen({ c }: { c: (typeof Colors)["dark"] }) {
   const [permissions, requestPermission] = useCameraPermissions();
   const [state, setState] = useState<State>("scanning");
   const [scannedUser, setScannedUser] = useState<ScannedUser | null>(null);
+  const [scoreUpdating, setScoreUpdating] = useState(false);
   const [errMsg, setErrMsg] = useState("");
   const isFocused = useIsFocused();
 
@@ -63,13 +64,15 @@ function AdminScreen({ c }: { c: (typeof Colors)["dark"] }) {
 
   function updateScore(delta: number) {
     if (!scannedUser) return;
-    const newScore = scannedUser.score + delta;
-    updateDoc(doc(db, "users", scannedUser.uid), { score: newScore }).then(
-      () => {
-        console.log(`updated score to ${newScore}`);
-        setScannedUser({ ...scannedUser, score: newScore });
-      },
-    );
+    setScoreUpdating(true);
+
+    updateDoc(doc(db, "users", scannedUser.uid), {
+      score: increment(delta),
+    }).then(() => {
+      // console.log(`updated score to ${newScore}`);
+      setScannedUser({ ...scannedUser, score: scannedUser.score + delta });
+      setScoreUpdating(false);
+    });
   }
 
   if (!permissions) return null;
@@ -108,7 +111,9 @@ function AdminScreen({ c }: { c: (typeof Colors)["dark"] }) {
         <View style={styles.scanOverlay}>
           <View style={styles.scanFrame} />
           <Text style={styles.scanHint}>
-            {state === "scanning" ? "Point the camera at participant's QR code" : "Fetching Participant..."}
+            {state === "scanning"
+              ? "Point the camera at participant's QR code"
+              : "Fetching Participant..."}
           </Text>
         </View>
       </View>
@@ -222,6 +227,7 @@ function AdminScreen({ c }: { c: (typeof Colors)["dark"] }) {
                     },
                   ]}
                   onPress={() => updateScore(delta)}
+                  disabled={scoreUpdating}
                 >
                   <Text
                     style={[
