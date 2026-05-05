@@ -1,11 +1,12 @@
 import {
-    ReactNode,
-    createContext,
-    useContext,
-    useEffect,
-    useState,
+  ReactNode,
+  createContext,
+  useContext,
+  useEffect,
+  useState,
 } from "react";
 
+import { useAuth } from "@/context/auth";
 import { db } from "@/firebaseConfig";
 
 import { collection, onSnapshot } from "firebase/firestore";
@@ -43,11 +44,26 @@ function parseTimeValue(data: Record<string, unknown>): string {
 }
 
 export function ScheduleProvider({ children }: { children: ReactNode }) {
+  const { user, loading: authLoading } = useAuth();
   const [events, setEvents] = useState<ScheduleItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (authLoading) {
+      return;
+    }
+
+    if (!user) {
+      setEvents([]);
+      setLoading(false);
+      setError(null);
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
     const unsubscribe = onSnapshot(
       collection(db, "schedule"),
       (snap) => {
@@ -85,7 +101,7 @@ export function ScheduleProvider({ children }: { children: ReactNode }) {
     );
 
     return unsubscribe;
-  }, []);
+  }, [user, authLoading]);
 
   return (
     <ScheduleContext.Provider value={{ events, loading, error }}>
