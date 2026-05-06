@@ -18,7 +18,10 @@ export default function ScheduleScreen() {
   if (!user) return <Redirect href="/login" />;
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: c.background }} edges={["top"]}>
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor: c.background }}
+      edges={["top"]}
+    >
       <ScrollView contentContainerStyle={styles.scroll}>
         <Text style={[styles.heading, { color: c.text }]}>Event Schedule</Text>
         <Text style={[styles.subheading, { color: c.muted }]}>
@@ -102,7 +105,9 @@ export default function ScheduleScreen() {
                 </View>
               </View>
 
-              <Text style={[styles.title, { color: c.text }]}>{event.title}</Text>
+              <Text style={[styles.title, { color: c.text }]}>
+                {event.title}
+              </Text>
               <Text style={[styles.location, { color: c.muted }]}>
                 {event.location}
               </Text>
