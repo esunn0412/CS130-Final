@@ -87,7 +87,7 @@ export function ScheduleProvider({ children }: { children: ReactNode }) {
             };
           })
           .sort((a, b) => {
-            return a.title.localeCompare(b.title);
+            return compareDates(a.time, b.time);
           });
 
         setEvents(nextEvents);
@@ -109,6 +109,27 @@ export function ScheduleProvider({ children }: { children: ReactNode }) {
     </ScheduleContext.Provider>
   );
 }
+
+const getHour = (date: string) => {
+  let hour = 0;
+  if (date.charAt(1) === ":") {
+    hour = parseInt(date.charAt(0));
+  } else {
+    hour = parseInt(date.substring(0, 2));
+  }
+  for (const lettr of date) {
+    if (lettr === "P") {
+      hour += 12;
+    }
+  }
+  return hour;
+};
+
+const compareDates = (date1: string, date2: string) => {
+  let hour1 = getHour(date1);
+  let hour2 = getHour(date2);
+  return hour1 - hour2;
+};
 
 export function useSchedule() {
   const context = useContext(ScheduleContext);
